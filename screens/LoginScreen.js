@@ -14,26 +14,25 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { login } = useContext(AuthContext);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Validation Error", "Please enter both email and password.");
+    if (!mobile || !password) {
+      Alert.alert("Validation Error", "Please enter both mobile number and password.");
       return;
     }
 
     setLoading(true);
     try {
-      console.log(API_URL)
       const response = await axios.post(`${API_URL}/api/users/login`, {
-        email,
+        mobile, // ✅ login with mobile instead of email
         password,
       });
-
+      console.log('tes',response)
       if (response.status === 200) {
         const { token, user } = response.data;
 
@@ -72,14 +71,16 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.title}>Welcome Back 👋</Text>
         <Text style={styles.subtitle}>Login to continue</Text>
 
+        {/* Mobile Number */}
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          placeholder="Mobile Number"
+          value={mobile}
+          onChangeText={setMobile}
+          keyboardType="phone-pad"
         />
+
+        {/* Password */}
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -88,6 +89,7 @@ export default function LoginScreen({ navigation }) {
           secureTextEntry
         />
 
+        {/* Login Button */}
         <TouchableOpacity
           style={[styles.button, { opacity: loading ? 0.7 : 1 }]}
           onPress={handleLogin}
@@ -99,6 +101,7 @@ export default function LoginScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
 
+        {/* Links */}
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
           <Text style={styles.linkText}>Don’t have an account? Sign up</Text>
         </TouchableOpacity>

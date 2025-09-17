@@ -23,60 +23,46 @@ export default function SignupScreen({ navigation }) {
   const [role, setRole] = useState("resident");
 
   const handleSignup = async () => {
-  if (!name || !mobile || !password || !confirmPassword) {
-    Alert.alert("Error", "Please fill all required fields");
-    return;
-  }
-  if (password !== confirmPassword) {
-    Alert.alert("Error", "Passwords do not match");
-    return;
-  }
-
-  try {
-    const payload = { name, email, mobile, block, floor, flatNo, password, role };
-
-    const response = await fetch("http://192.168.8.62:5000/api/user/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    if (response.status === 201) {
-      Alert.alert("Success", data.message);
-    } else {
-      Alert.alert("Error", data.message);
+    if (!name || !mobile || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill all required fields");
+      return;
     }
-  } catch (error) {
-    console.log(error);
-    Alert.alert("Error", "Something went wrong");
-  }
-};
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
 
-//   const handleSignup = () => {
-//     if (!name || !mobile || !password || !confirmPassword) {
-//       Alert.alert("Error", "Please fill all required fields");
-//       return;
-//     }
-//     if (password !== confirmPassword) {
-//       Alert.alert("Error", "Passwords do not match");
-//       return;
-//     }
+    try {
+      const payload = { name, email, mobile, block, floor, flatNo, password, role };
 
-//     const payload = {
-//       name,
-//       email,
-//       mobile,
-//       block,
-//       floor,
-//       flatNo,
-//       password,
-//       role,
-//     };
+      const response = await fetch("http://192.168.8.62:5000/api/signup", { // ✅ Corrected path
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-//     console.log("Signup Data:", payload);
-//     Alert.alert("Success", "Signup successful!");
-//   };
+      // Handle non-JSON response
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.log("Non-JSON response:", text);
+        Alert.alert("Error", "Server error, check backend logs");
+        return;
+      }
+
+      if (response.status === 201) {
+        Alert.alert("Success", data.message);
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Error", data.message || "Signup failed");
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Something went wrong");
+    }
+  };
 
   return (
     <LinearGradient
@@ -84,11 +70,7 @@ export default function SignupScreen({ navigation }) {
       style={{ flex: 1, justifyContent: "center" }}
     >
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          padding: 20,
-        }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 20 }}
         showsVerticalScrollIndicator={false}
       >
         <View
@@ -115,12 +97,7 @@ export default function SignupScreen({ navigation }) {
           </Text>
 
           {/* Full Name */}
-          <InputField
-            icon="person-outline"
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
-          />
+          <InputField icon="person-outline" placeholder="Full Name" value={name} onChangeText={setName} />
 
           {/* Email */}
           <InputField
@@ -141,17 +118,8 @@ export default function SignupScreen({ navigation }) {
           />
 
           {/* Role Selection */}
-          <Text style={{ fontSize: 14, marginBottom: 8, color: "#555" }}>
-            Select Role
-          </Text>
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 12,
-              marginBottom: 18,
-            }}
-          >
+          <Text style={{ fontSize: 14, marginBottom: 8, color: "#555" }}>Select Role</Text>
+          <View style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 12, marginBottom: 18 }}>
             <Picker selectedValue={role} onValueChange={(itemValue) => setRole(itemValue)}>
               <Picker.Item label="Resident" value="resident" />
               <Picker.Item label="Committee" value="committee" />
@@ -163,37 +131,14 @@ export default function SignupScreen({ navigation }) {
           {/* Society Fields (only for residents) */}
           {role === "resident" && (
             <>
-              <InputField
-                icon="business-outline"
-                placeholder="Block / Wing"
-                value={block}
-                onChangeText={setBlock}
-              />
-
-              <InputField
-                icon="layers-outline"
-                placeholder="Floor"
-                value={floor}
-                onChangeText={setFloor}
-              />
-
-              <InputField
-                icon="home-outline"
-                placeholder="Flat Number"
-                value={flatNo}
-                onChangeText={setFlatNo}
-              />
+              <InputField icon="business-outline" placeholder="Block / Wing" value={block} onChangeText={setBlock} />
+              <InputField icon="layers-outline" placeholder="Floor" value={floor} onChangeText={setFloor} />
+              <InputField icon="home-outline" placeholder="Flat Number" value={flatNo} onChangeText={setFlatNo} />
             </>
           )}
 
           {/* Password */}
-          <InputField
-            icon="lock-closed-outline"
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          <InputField icon="lock-closed-outline" placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
 
           {/* Confirm Password */}
           <InputField
@@ -206,25 +151,14 @@ export default function SignupScreen({ navigation }) {
 
           {/* Submit Button */}
           <TouchableOpacity onPress={handleSignup} style={{ marginTop: 10 }}>
-            <LinearGradient
-              colors={["#43e97b", "#38f9d7"]}
-              style={{
-                padding: 15,
-                borderRadius: 15,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
-                Sign Up
-              </Text>
+            <LinearGradient colors={["#43e97b", "#38f9d7"]} style={{ padding: 15, borderRadius: 15, alignItems: "center" }}>
+              <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>Sign Up</Text>
             </LinearGradient>
           </TouchableOpacity>
 
           {/* Already account */}
           <TouchableOpacity style={{ marginTop: 18 }} onPress={() => navigation.navigate("Login")}>
-            <Text style={{ textAlign: "center", color: "#007AFF", fontSize: 16 }}>
-              Already have an account? Login
-            </Text>
+            <Text style={{ textAlign: "center", color: "#007AFF", fontSize: 16 }}>Already have an account? Login</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -248,10 +182,7 @@ const InputField = ({ icon, ...props }) => {
       }}
     >
       <Ionicons name={icon} size={20} color="#666" style={{ marginRight: 8 }} />
-      <TextInput
-        style={{ flex: 1, paddingVertical: 10, fontSize: 16 }}
-        {...props}
-      />
+      <TextInput style={{ flex: 1, paddingVertical: 10, fontSize: 16 }} {...props} />
     </View>
   );
 };

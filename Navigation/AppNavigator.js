@@ -10,8 +10,8 @@ import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 
 // import SupplierTabs from "../screens/SupplierTabs";
-// import ResidentTabs from "../screens/ResidentTabs";
-
+import ResidentTabs from "../screens/ResidentTabs";
+import ComplaintsListScreen from "../screens/ComplaintsListScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,13 +35,14 @@ export default function AppNavigator() {
           user
             ? user.role === "retailer"
               ? "ResidentTabs"
-              : "SupplierTabs"
+              : "ResidentTabs"
             : "Login"
         }
       >
         {/* Auth screens */}
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: "SMS" }} />
         <Stack.Screen name="Signup" component={SignupScreen} options={{ title: "SMS" }} />
+        <Stack.Screen name="ComplaintsList" component={ComplaintsListScreen} options={{ title: "SMS" }} />
 
         {/* Supplier tabs (with bottom nav) */}
         {/* <Stack.Screen
@@ -50,11 +51,11 @@ export default function AppNavigator() {
           options={{ title: 'SMS' }}
         /> */}
 
-        {/* <Stack.Screen
+        <Stack.Screen
           name="ResidentTabs"
           component={ResidentTabs}
           options={{ title: 'BizLink' }}
-        /> */}
+        />
         
         
       </Stack.Navigator>
